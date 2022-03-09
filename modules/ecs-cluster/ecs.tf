@@ -18,24 +18,13 @@ data "aws_ami" "ecs" {
   owners = ["591542846629"] # AWS
 }
 
-#
 # ECS cluster
-#
-
 resource "aws_ecs_cluster" "cluster" {
   name = var.cluster_name
 }
 
-data "template_file" "ecs_init" {
-  template = file("${path.module}/templates/ecs_init.tpl")
-  vars = {
-    cluster_name = var.cluster_name
-  }
-}
 
-#
 # launchconfig
-#
 resource "aws_launch_configuration" "cluster" {
   name_prefix          = "ecs-${var.cluster_name}-launchconfig"
   image_id             = data.aws_ami.ecs.id
@@ -51,9 +40,7 @@ resource "aws_launch_configuration" "cluster" {
   }
 }
 
-#
 # autoscaling
-#
 resource "aws_autoscaling_group" "cluster" {
   name                 = "ecs-${var.cluster_name}-autoscaling"
   vpc_zone_identifier  = split(",", var.vpc_subnets)
